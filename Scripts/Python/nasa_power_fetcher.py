@@ -65,19 +65,19 @@ DEFAULT_PARAMETERS = [
     "T2M",               # 2m Air Temperature (°C)
     "PRECTOTCORR",       # Precipitation Corrected (mm/day for daily; mm/month for monthly)
     "RH2M",              # Relative Humidity at 2m (%)
-    "WS2M",              # Wind Speed at 2m (m/s)
-    "ALLSKY_SFC_SW_DWN", # Shortwave Downwelling Radiation (MJ/m^2/day)
+    "WS2M",              # Wind Speed at 2m (m/s),
+    "PS",                 # Shortwave Downwelling Radiation (MJ/m^2/day)
 ]
 
 # Aggregation policy when building monthly/annual from DAILY
 # SUM: precipitation, radiation-like fluxes
 # MEAN: temperature, humidity, wind speed
 VAR_AGG_POLICY = {
-    "SUM": {"PRECTOTCORR", "ALLSKY_SFC_SW_DWN"},
-    "MEAN": {"T2M", "RH2M", "WS2M"},
+    "SUM": {"PRECTOTCORR"},
+    "MEAN": {"T2M", "RH2M", "WS2M", "PS"},
 }
 # Any variable not listed falls back to MEAN.
-# You can override via CLI: --sum-vars PRECTOTCORR,ALLSKY_SFC_SW_DWN --mean-vars T2M,RH2M,WS2M
+# You can override via CLI: --sum-vars PRECTOTCORR --mean-vars T2M,RH2M,WS2M
 
 @dataclass
 class Point:
@@ -273,8 +273,8 @@ def main():
     parser.add_argument("--community", type=str, default="AG", help="NASA POWER 'community' parameter")
     parser.add_argument("--also-daily", action="store_true",
                         help="If temporal=monthly, also fetch daily (adds an extra API call) to compute monthly/annual on our side")
-    parser.add_argument("--sum-vars", type=str, default="PRECTOTCORR,ALLSKY_SFC_SW_DWN", help="Variables to SUM when aggregating daily")
-    parser.add_argument("--mean-vars", type=str, default="T2M,RH2M,WS2M", help="Variables to MEAN when aggregating daily")
+    parser.add_argument("--sum-vars", type=str, default="PRECTOTCORR", help="Variables to SUM when aggregating daily")
+    parser.add_argument("--mean-vars", type=str, default="T2M,RH2M,WS2M,PS", help="Variables to MEAN when aggregating daily")
     parser.add_argument("--sleep", type=float, default=0.5, help="Sleep seconds between requests (rate limiting)")
     parser.add_argument("--retries", type=int, default=5, help="HTTP total retries")
     args = parser.parse_args()
